@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -12,6 +13,21 @@ export default function Home() {
           height={38}
           priority
         />
+        
+        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 w-full max-w-2xl">
+          <h2 className="text-xl font-bold mb-2">Twilio Study Hub</h2>
+          <p className="mb-4">Welcome to the Twilio Study Hub application. This app demonstrates integration with Twilio for messaging services.</p>
+          
+          <div className="flex flex-col gap-2">
+            <Link href="/send-message" className="text-blue-600 hover:underline flex items-center">
+              <span className="mr-2">→</span> Send a test message
+            </Link>
+            <Link href="/hello" className="text-blue-600 hover:underline flex items-center">
+              <span className="mr-2">→</span> View sample study session
+            </Link>
+          </div>
+        </div>
+        
         <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2 tracking-[-.01em]">
             Get started by editing{" "}
