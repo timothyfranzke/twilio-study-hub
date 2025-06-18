@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { Suspense, useState } from 'react';
 
-export default function SendMessage() {
-  const router = useRouter();
+// Client component that uses navigation hooks
+function MessageForm() {
+  // We'll use a ref to store the router for navigation after form submission
+  const routerRef = React.useRef<any>(null);
+  
   const [formData, setFormData] = useState({
     phoneNumber: '+15551234567', // Default placeholder
     message: 'Hello, I need help with my studies!',
@@ -15,6 +17,13 @@ export default function SendMessage() {
     error: null as string | null,
     response: null as any,
   });
+  
+  // Load the router dynamically to avoid SSG issues
+  React.useEffect(() => {
+    import('next/navigation').then(({ useRouter }) => {
+      routerRef.current = useRouter();
+    });
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -54,7 +63,13 @@ export default function SendMessage() {
       if (urlMatch && urlMatch[1]) {
         // Wait a moment before redirecting
         setTimeout(() => {
-          router.push(urlMatch[1]);
+          // Use the router ref instead of direct router access
+          if (routerRef.current) {
+            routerRef.current.push(urlMatch[1]);
+          } else {
+            // Fallback if router isn't available yet
+            window.location.href = urlMatch[1];
+          }
         }, 3000);
       }
     } catch (error) {
@@ -144,5 +159,28 @@ export default function SendMessage() {
         </p>
       </div>
     </div>
+  );
+}
+
+// Loading fallback component
+function LoadingFallback() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-8">
+      <h1 className="text-3xl font-bold mb-6">Send a Message to Twilio</h1>
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <div className="flex justify-center p-8">
+          <p>Loading form...</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function SendMessage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <MessageForm />
+    </Suspense>
   );
 }
